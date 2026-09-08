@@ -95,6 +95,14 @@ class PatientControllerIntegrationTest {
     }
 
     @Test
+    void searchPatientReturnsEmptyListWhenNoPatientsMatch() throws Exception {
+        createPatient("Maria", "Garcia", "maria.garcia@example.com");
+        mockMvc.perform(get("/api/patients").param("search", "NoMatch"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
     void findPatientReturnsPatientById() throws Exception {
         Patient patient = createPatient("Maria", "Garcia", "maria.garcia@example.com");
 
