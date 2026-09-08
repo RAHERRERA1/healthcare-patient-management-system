@@ -1,6 +1,6 @@
 # Healthcare Patient Management System
 
-Backend API for managing patients in a healthcare setting. This project is built with Java, Spring Boot, Spring Data JPA, PostgreSQL, Bean Validation, Spring Security, and OpenAPI documentation.
+Backend REST API for managing patients, doctors, and appointments in a healthcare setting. This project is built with Java, Spring Boot, Spring Data JPA, PostgreSQL, Bean Validation, Spring Security, OpenAPI documentation, Docker, and Docker Compose.
 
 ## Tech Stack
 
@@ -11,19 +11,23 @@ Backend API for managing patients in a healthcare setting. This project is built
 - PostgreSQL
 - H2 for tests
 - Maven Wrapper
+- Spring Security
 - SpringDoc OpenAPI
+- Docker
+- Docker Compose
 
 ## Current Features
 
-- Create patients
-- List patients
+- Create, list, view, update, and delete patients
 - Search patients by first or last name
-- View one patient
-- Update patients
-- Delete patients
+- Create, list, view, update, and delete doctors
+- Create, list, view, update, and delete appointments
+- Connect appointments to patients and doctors
+- Filter appointments by patient, doctor, or status
 - Request validation
 - Consistent API error responses
 - Swagger UI enabled for API exploration
+- Docker setup for the API and PostgreSQL
 
 ## PostgreSQL Setup
 
@@ -43,7 +47,7 @@ DB_PASSWORD=postgres
 
 If your PostgreSQL password is different, set the environment variable `DB_PASSWORD` before running the app.
 
-## Run the App
+## Run The App Locally
 
 ```powershell
 .\mvnw.cmd spring-boot:run
@@ -54,6 +58,20 @@ Open Swagger UI:
 ```text
 http://localhost:8080/swagger-ui.html
 ```
+
+## Run With Docker Compose
+
+```powershell
+docker compose up --build
+```
+
+The API runs on:
+
+```text
+http://localhost:8080
+```
+
+Docker Compose starts PostgreSQL on host port `5433`.
 
 ## Run Tests
 
@@ -77,8 +95,9 @@ http://localhost:8080/swagger-ui.html
 
 ## Next Milestones
 
-- Add doctor/provider management
-- Add appointment scheduling
-- Add medical records and visit notes
-- Add role-based access for admin, doctor, and receptionist users
 - Add integration tests for patient API endpoints
+- Add integration tests for doctor and appointment endpoints
+- Add GitHub Actions CI to run tests on every push
+- Add Docker image build checks in CI
+- Deploy to AWS with PostgreSQL hosted in RDS
+- Add role-based access for admin, doctor, and receptionist users
