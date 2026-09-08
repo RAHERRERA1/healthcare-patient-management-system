@@ -103,6 +103,15 @@ class PatientControllerIntegrationTest {
     }
 
     @Test
+    void findPatientReturnsNotFoundWhenPatientDoesNotExist() throws Exception {
+        createPatient("Maria", "Garcia", "maria.garcia@example.com");
+        mockMvc.perform(get("/api/patients/{id}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
+    }
+
+    @Test
     void findPatientReturnsPatientById() throws Exception {
         Patient patient = createPatient("Maria", "Garcia", "maria.garcia@example.com");
 
