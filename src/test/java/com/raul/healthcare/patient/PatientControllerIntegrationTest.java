@@ -74,6 +74,27 @@ class PatientControllerIntegrationTest {
     }
 
     @Test
+    void searchPatientGetsByLastName() throws Exception {
+        createPatient("Maria", "Garcia", "maria.garcia@example.com");
+
+        mockMvc.perform(get("/api/patients").param("search", "Garcia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].lastName").value("Garcia"));
+    }
+
+    @Test
+    void searchPatientGetsByFirstName() throws Exception {
+        createPatient("Raul", "Romero", "raulromero@example.com");
+
+        mockMvc.perform(get("/api/patients").param("search", "Raul"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].firstName").value("Raul"));
+
+    }
+
+    @Test
     void findPatientReturnsPatientById() throws Exception {
         Patient patient = createPatient("Maria", "Garcia", "maria.garcia@example.com");
 
