@@ -158,6 +158,14 @@ class PatientControllerIntegrationTest {
     }
 
     @Test
+    void deletePatientReturnsNotFoundWhenPatientDoesNotExist() throws Exception {
+        mockMvc.perform(delete("/api/patients/{id}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
+    }
+
+    @Test
     void createPatientReturnsBadRequestForInvalidRequest() throws Exception {
         String invalidJson = """
                 {
