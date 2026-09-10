@@ -122,6 +122,17 @@ class PatientControllerIntegrationTest {
     }
 
     @Test
+    void updatePatientReturnsNotFoundWhenPatientDoesNotExist() throws Exception {
+        mockMvc.perform(put("/api/patients/{id}", 999)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validPatientJson("Maria", "Garcia", "maria.garcia@example.com")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
+
+    }
+
+    @Test
     void updatePatientReturnsUpdatedPatient() throws Exception {
         Patient patient = createPatient("Maria", "Garcia", "maria.garcia@example.com");
 
