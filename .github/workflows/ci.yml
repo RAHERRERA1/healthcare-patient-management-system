@@ -27,3 +27,6 @@ jobs:
 
       - name: Run verification
         run: ./mvnw clean verify
+        with:
+          name: healthcare-api-jar
+          path: target/*.jar
