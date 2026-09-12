@@ -33,3 +33,6 @@ jobs:
         with:
           name: healthcare-api-jar
           path: target/*.jar
+
+      - name: Build Docker image
+        run: docker build -t healthcare-api:ci
