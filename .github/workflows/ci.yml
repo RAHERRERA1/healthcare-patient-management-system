@@ -37,8 +37,35 @@ jobs:
       - name: Build Docker image
         run: docker build -t healthcare-api:ci .
 
+      - name: Create Docker network
+        run: docker network create healthcare-ci
+
+      - name: Run PostgreSQL container
+        run: |
+          docker run -d --name healthcare-postgres --network healthcare-ci \
+            -e POSTGRES_DB=healthcare_pms \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            postgres:16
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..30}; do
+            if docker exec healthcare-postgres pg_isready -U postgres -d healthcare_pms; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs healthcare-postgres
+          exit 1
+
       - name: Run Docker container
-        run: docker run -d --name healthcare-api -p 8080:8080 -e SPRING_PROFILES_ACTIVE=test healthcare-api:ci
+        run: |
+          docker run -d --name healthcare-api --network healthcare-ci -p 8080:8080 \
+            -e DB_URL=jdbc:postgresql://healthcare-postgres:5432/healthcare_pms \
+            -e DB_USERNAME=postgres \
+            -e DB_PASSWORD=postgres \
+            healthcare-api:ci
 
       - name: Wait for API health
         run: |
@@ -53,4 +80,7 @@ jobs:
 
       - name: Stop Docker container
         if: always()
-        run: docker stop healthcare-api
+        run: |
+          docker rm -f healthcare-api || true
+          docker rm -f healthcare-postgres || true
+          docker network rm healthcare-ci || true
