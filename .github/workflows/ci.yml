@@ -35,4 +35,4 @@ jobs:
           path: target/*.jar
 
       - name: Build Docker image
-        run: docker build -t healthcare-api:ci
+        run: docker build -t healthcare-api:ci .
