@@ -36,3 +36,21 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t healthcare-api:ci .
+
+      - name: Run Docker container
+        run: docker run -d --name healthcare-api -p 8080:8080 -e SPRING_PROFILES_ACTIVE=test healthcare-api:ci
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8080/actuator/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs healthcare-api
+          exit 1
+
+      - name: Stop Docker container
+        if: always()
+        run: docker stop healthcare-api
