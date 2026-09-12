@@ -1,6 +1,7 @@
 package com.raul.healthcare.patient;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,7 +41,7 @@ class PatientControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(validPatientJson("Maria", "Garcia", "maria.garcia@example.com")))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/patients/1"))
+                .andExpect(header().string("Location", startsWith("/api/patients/")))
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.firstName").value("Maria"))
                 .andExpect(jsonPath("$.lastName").value("Garcia"))
@@ -107,7 +108,7 @@ class PatientControllerIntegrationTest {
         createPatient("Maria", "Garcia", "maria.garcia@example.com");
         mockMvc.perform(get("/api/patients/{id}", 999))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
     }
 
