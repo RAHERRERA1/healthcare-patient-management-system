@@ -28,6 +28,8 @@ Backend REST API for managing patients, doctors, and appointments in a healthcar
 - Consistent API error responses
 - Swagger UI enabled for API exploration
 - Docker setup for the API and PostgreSQL
+- Actuator health endpoint for deployment health checks
+- GitHub Actions CI pipeline
 
 ## PostgreSQL Setup
 
@@ -79,6 +81,24 @@ Docker Compose starts PostgreSQL on host port `5433`.
 .\mvnw.cmd test
 ```
 
+## CI/CD Pipeline
+
+This project uses GitHub Actions to validate every push and pull request to `main`.
+
+The CI workflow:
+
+- Checks out the repository
+- Sets up Java 21
+- Runs `./mvnw clean verify`
+- Uploads the packaged application JAR as a build artifact
+- Builds the Docker image
+- Starts a PostgreSQL container
+- Starts the API container connected to PostgreSQL
+- Verifies the API is healthy at `/actuator/health`
+- Cleans up the Docker containers and network
+
+The pipeline confirms that the application can compile, pass automated tests, package into a JAR, build as a Docker image, start with PostgreSQL, and respond to a health check.
+
 ## Example Patient Request
 
 ```json
@@ -95,9 +115,6 @@ Docker Compose starts PostgreSQL on host port `5433`.
 
 ## Next Milestones
 
-- Add integration tests for patient API endpoints
 - Add integration tests for doctor and appointment endpoints
-- Add GitHub Actions CI to run tests on every push
-- Add Docker image build checks in CI
 - Deploy to AWS with PostgreSQL hosted in RDS
 - Add role-based access for admin, doctor, and receptionist users
