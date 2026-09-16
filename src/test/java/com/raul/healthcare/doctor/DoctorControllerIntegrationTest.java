@@ -55,6 +55,16 @@ class DoctorControllerIntegrationTest {
                 .andExpect(jsonPath("$", hasSize(2)));
     }
 
+    @Test
+    void getDoctorByIdReturnsDoctor() throws Exception {
+        Doctor doctor = createDoctor("Elena", "Martinez", "Cardiology", "elena.martinez@example.com");
+        mockMvc.perform(get("/api/doctors/{id}", doctor.getId()))
+                .andExpect((status().isOk()))
+                .andExpect(jsonPath("$.id").value(doctor.getId()))
+                .andExpect(jsonPath("$.firstName").value("Elena"))
+                .andExpect(jsonPath("$.email").value("elena.martinez@example.com"));
+    }
+
     private Doctor createDoctor(String firstName, String lastName, String specialty, String email) {
         Doctor doctor = new Doctor();
         doctor.setFirstName(firstName);
@@ -63,6 +73,7 @@ class DoctorControllerIntegrationTest {
         doctor.setEmail(email);
         return doctorRepository.save(doctor);
     }
+
 
     private String validDoctorJson(String firstName, String lastName, String specialty, String email) {
         return """
