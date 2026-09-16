@@ -88,6 +88,16 @@ class DoctorControllerIntegrationTest {
     }
 
     @Test
+    void deleteDoctorReturnsNoContent() throws Exception {
+        Doctor doctor = createDoctor("Elena", "Martinez", "Cardiology", "elenamartinez@example.com");
+        mockMvc.perform(delete("/api/doctors/{id}", doctor.getId()))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(get("/api/doctors/{id}", doctor.getId()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
     void updateDoctorReturnsNotFoundWhenDoctorDoesNotExist() throws Exception {
         mockMvc.perform(put("/api/doctors/{id}", 999)
                     .contentType(MediaType.APPLICATION_JSON)
