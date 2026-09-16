@@ -1,10 +1,9 @@
 package com.raul.healthcare.doctor;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,6 +70,21 @@ class DoctorControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message").value("Could not find doctor with id: 1"));
+    }
+
+    @Test
+    void updateDoctorReturnsUpdatedDoctor() throws Exception {
+        Doctor doctor = createDoctor("Elena", "Martinez", "Cardiology", "elena.martinez@example.com");
+
+        mockMvc.perform(put("/api/doctors/{id}", doctor.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(validDoctorJson("Fabiola", "Mendoza", "Neurology", "fabiolamendoza@example.com")))
+                .andExpect((status().isOk()))
+                .andExpect(jsonPath("$.id").value(doctor.getId()))
+                .andExpect(jsonPath("$.firstName").value("Fabiola"))
+                .andExpect(jsonPath("$.lastName").value("Mendoza"))
+                .andExpect(jsonPath("$.specialty").value("Neurology"))
+                .andExpect(jsonPath("$.email").value("fabiolamendoza@example.com"));
     }
 
     private Doctor createDoctor(String firstName, String lastName, String specialty, String email) {
