@@ -65,6 +65,14 @@ class DoctorControllerIntegrationTest {
                 .andExpect(jsonPath("$.email").value("elena.martinez@example.com"));
     }
 
+    @Test
+    void getDoctorByIdReturnsNotFoundWhenDoctorDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/doctors/{id}",1))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Could not find doctor with id: 1"));
+    }
+
     private Doctor createDoctor(String firstName, String lastName, String specialty, String email) {
         Doctor doctor = new Doctor();
         doctor.setFirstName(firstName);
