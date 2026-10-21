@@ -46,6 +46,17 @@ class DoctorControllerIntegrationTest {
     }
 
     @Test
+    void createDoctorReturnsBadRequestForInvalidEmail() throws Exception {
+        mockMvc.perform(post("/api/doctors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validDoctorJson("Elena", "Martinez", "Cardiology", "not-an-email")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.errors.email").exists());
+    }
+
+    @Test
     void getDoctorsReturnsAllDoctors() throws Exception {
         createDoctor("Elena", "Martinez", "Cardiology", "elena.martinez@example.com");
         createDoctor("James", "Wilson", "Pediatrics", "james.wilson@example.com");
