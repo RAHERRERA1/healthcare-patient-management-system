@@ -1,5 +1,8 @@
 package com.raul.healthcare.appointment;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,6 +78,29 @@ class AppointmentControllerIntegrationTest {
                 .andExpect(jsonPath("$.status").value("SCHEDULED"));
     }
 
+    @Test
+    void getAppointmentsReturnsAllAppointments() throws Exception {
+        Patient patient = createPatient("Maria", "Garcia", "maria.garcia@example.com");
+        Doctor doctor = createDoctor("Elena", "Martinez", "Cardiology", "elena.martinez@example.com");
+        createAppointment(
+                patient,
+                doctor,
+                LocalDateTime.now().plusDays(1),
+                "Annual checkup",
+                AppointmentStatus.SCHEDULED);
+        createAppointment(
+                patient,
+                doctor,
+                LocalDateTime.now().plusDays(2),
+                "Follow-up visit",
+                AppointmentStatus.RESCHEDULED);
+
+        mockMvc.perform(get("/api/appointments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].reason", hasItems("Annual checkup", "Follow-up visit")));
+    }
+
     private void deleteTestData() {
         appointmentRepository.deleteAll();
         patientRepository.deleteAll();
@@ -100,6 +126,21 @@ class AppointmentControllerIntegrationTest {
         doctor.setSpecialty(specialty);
         doctor.setEmail(email);
         return doctorRepository.save(doctor);
+    }
+
+    private Appointment createAppointment(
+            Patient patient,
+            Doctor doctor,
+            LocalDateTime appointmentDateTime,
+            String reason,
+            AppointmentStatus status) {
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDateTime(appointmentDateTime);
+        appointment.setReason(reason);
+        appointment.setStatus(status);
+        return appointmentRepository.save(appointment);
     }
 
     private String validAppointmentJson(
