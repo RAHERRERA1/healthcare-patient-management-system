@@ -131,6 +131,32 @@ class AppointmentControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Could not find appointment with id: 999"));
     }
 
+    @Test
+    void getAppointmentsByPatientIdReturnsPatientAppointments() throws Exception {
+        Patient maria = createPatient("Maria", "Garcia", "maria.garcia@example.com");
+        Patient james = createPatient("James", "Wilson", "james.wilson@example.com");
+        Doctor doctor = createDoctor("Elena", "Martinez", "Cardiology", "elena.martinez@example.com");
+        createAppointment(
+                maria,
+                doctor,
+                LocalDateTime.now().plusDays(1),
+                "Annual checkup",
+                AppointmentStatus.SCHEDULED);
+        createAppointment(
+                james,
+                doctor,
+                LocalDateTime.now().plusDays(2),
+                "Follow-up visit",
+                AppointmentStatus.SCHEDULED);
+
+        mockMvc.perform(get("/api/appointments/patient/{patientId}", maria.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].patientId").value(maria.getId()))
+                .andExpect(jsonPath("$[0].patientFullName").value("Maria Garcia"))
+                .andExpect(jsonPath("$[0].reason").value("Annual checkup"));
+    }
+
     private void deleteTestData() {
         appointmentRepository.deleteAll();
         patientRepository.deleteAll();
