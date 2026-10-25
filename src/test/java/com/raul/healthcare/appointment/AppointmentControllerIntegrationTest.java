@@ -123,6 +123,14 @@ class AppointmentControllerIntegrationTest {
                 .andExpect(jsonPath("$.status").value("SCHEDULED"));
     }
 
+    @Test
+    void getAppointmentByIdReturnsNotFoundWhenAppointmentDoesNotExist() throws Exception {
+        mockMvc.perform(get("/api/appointments/{id}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Could not find appointment with id: 999"));
+    }
+
     private void deleteTestData() {
         appointmentRepository.deleteAll();
         patientRepository.deleteAll();
